@@ -30,21 +30,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .exceptionHandling(exception -> exception
-                .authenticationEntryPoint((request, response, authException) -> {
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.setContentType("application/json");
-                    response.getWriter().write("{\"message\":\"Unauthorized or invalid token\"}");
-                })
-            )
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/register", "/api/login").permitAll()
-                .anyRequest().authenticated()
-            )
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"message\":\"Unauthorized or invalid token\"}");
+                        }))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/register", "/api/login").permitAll()
+                        .anyRequest().authenticated())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -52,7 +50,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://127.0.0.1:5173"));
+        configuration.setAllowedOrigins(List.of(
+                "http://localhost:5173",
+                "http://127.0.0.1:5173",
+                "https://frontend-psi-flame-53.vercel.app"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
         configuration.setExposedHeaders(List.of("Authorization"));
